@@ -6,9 +6,6 @@ const db = require('../db');
 // it allows you to use async functions as route handlers
 const router = new Router();
 
-// export our router to be mounted by the parent application
-module.exports = router;
-
 // Get all restaurants
 router.get('/', async (req, res) => {
   try {
@@ -19,16 +16,16 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Get restaurant
-router.get('/:id', async (req, res) => {
-  const { id } = req.params;
-  return res.send(`Get restaurant ${id}`);
-});
-
 // Create restaurant
 router.post('/', async (req, res) => {
   console.log(req.body);
   return res.send('Created restaurant');
+});
+
+// Retrieve restaurant
+router.get('/:id', async (req, res) => {
+  const { id } = req.params;
+  return res.send(`Get restaurant ${id}`);
 });
 
 // Update restaurant
@@ -42,3 +39,6 @@ router.delete('/:id', async (req, res) => {
   const { id } = req.params;
   return res.send(`Deleted restaurant ${id}`);
 });
+
+// export our router to be mounted by the parent application
+module.exports = router;
