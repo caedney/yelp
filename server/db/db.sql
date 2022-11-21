@@ -7,4 +7,8 @@ CREATE TABLE restaurants (
 	price_range INT NOT NULL CHECK(price_range >= 1 AND price_range <= 5)
 );
 
-INSERT INTO restaurants (name, location, price_range) VALUES ('McDonalds', 'New York', 3);
+ALTER SEQUENCE restaurants_id_seq RESTART WITH 1;
+
+INSERT INTO restaurants (name, location, price_range) VALUES ('The Oatlands Chaser', 'Weybridge', 2);
+INSERT INTO restaurants (name, location, price_range) VALUES ('The Running Mare', 'Byfleet', 2);
+INSERT INTO restaurants (name, location, price_range) VALUES ('The Ivy', 'Byfleet', 1);
