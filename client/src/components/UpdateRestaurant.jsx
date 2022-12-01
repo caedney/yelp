@@ -1,32 +1,48 @@
 import * as React from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import restaurantsAPI from '../api/restaurants';
-import { RestaurantsContext } from '../context/RestaurantsContext';
 
-const AddRestaurant = () => {
-  const { addRestaurants } = React.useContext(RestaurantsContext);
+const UpdateRestaurant = () => {
+  const { id } = useParams();
+  const history = useNavigate();
 
   const [name, setName] = React.useState('');
   const [location, setLocation] = React.useState('');
   const [priceRange, setPriceRange] = React.useState('Price Range');
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    async function addRestaurant() {
+  React.useEffect(() => {
+    async function getRestaurant() {
       try {
-        const response = await restaurantsAPI.post('/', {
-          name,
-          location,
-          price_range: priceRange,
-        });
-
-        addRestaurants(response.data.data.restaurants[0]);
+        const response = await restaurantsAPI.get(`/${id}`);
+        setName(response.data.data.restaurants[0].name);
+        setLocation(response.data.data.restaurants[0].location);
+        setPriceRange(response.data.data.restaurants[0].price_range);
       } catch (error) {
         console.log(error.message);
       }
     }
 
-    addRestaurant();
+    getRestaurant();
+  }, [id, setName, setLocation, setPriceRange]);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    async function updateRestaurant() {
+      try {
+        await restaurantsAPI.put(`/${id}`, {
+          name,
+          location,
+          price_range: priceRange,
+        });
+
+        history('/');
+      } catch (error) {
+        console.log(error.message);
+      }
+    }
+
+    updateRestaurant();
   };
 
   return (
@@ -71,7 +87,7 @@ const AddRestaurant = () => {
               onClick={handleSubmit}
               type="submit"
             >
-              Add
+              Update
             </button>
           </div>
         </div>
@@ -80,4 +96,4 @@ const AddRestaurant = () => {
   );
 };
 
-export default AddRestaurant;
+export default UpdateRestaurant;
