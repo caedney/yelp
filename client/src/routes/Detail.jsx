@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { useParams } from 'react-router-dom';
 import restaurantsAPI from '../api/restaurants';
+import StarRating from '../components/StarRating';
 import { RestaurantsContext } from '../context/RestaurantsContext';
 
 const Detail = () => {
@@ -25,6 +26,7 @@ const Detail = () => {
     <div>
       <h1 className="text-center py-4">Detail</h1>
       <h2>{selectedRestaurant.name}</h2>
+      <StarRating rating={3.3} />
     </div>
   );
 };
