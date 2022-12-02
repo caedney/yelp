@@ -53,16 +53,19 @@ router.get('/:id', async (req, res) => {
 
     // Parameterized query
     // Prevents vulnerability from SQL injection attacks
-    const results = await db.query('SELECT * FROM restaurants WHERE id = $1', [
-      id,
-    ]);
+    const restaurant = await db.query(
+      'SELECT * FROM restaurants WHERE id = $1',
+      [id]
+    );
+
+    const reviews = await db.query(
+      'SELECT * FROM reviews WHERE restaurant_id = $1',
+      [id]
+    );
 
     return res.status(200).json({
-      status: 'success',
-      results: 1,
-      data: {
-        restaurants: results.rows,
-      },
+      restaurants: restaurant.rows,
+      reviews: reviews.rows,
     });
   } catch (error) {
     console.log(error.message);
@@ -74,8 +77,6 @@ router.put('/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const { name, location, price_range } = req.body;
-
-    console.log(req.body);
 
     const results = await db.query(
       'UPDATE restaurants SET name = $2, location = $3, price_range = $4 WHERE id = $1 RETURNING *',
@@ -103,6 +104,26 @@ router.delete('/:id', async (req, res) => {
 
     return res.status(204).json({
       status: 'success',
+    });
+  } catch (error) {
+    console.log(error.message);
+  }
+});
+
+// Create review
+router.post('/:id/add-review', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, review, rating } = req.body;
+
+    // RETURNING * returns all columns from the newly created row
+    const reviews = await db.query(
+      'INSERT INTO reviews (restaurant_id, name, review, rating) VALUES ($1, $2, $3, $4) RETURNING *',
+      [id, name, review, rating]
+    );
+
+    return res.status(200).json({
+      reviews: reviews.rows,
     });
   } catch (error) {
     console.log(error.message);

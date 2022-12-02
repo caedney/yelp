@@ -1,7 +1,8 @@
 import * as React from 'react';
 import { useParams } from 'react-router-dom';
 import restaurantsAPI from '../api/restaurants';
-import StarRating from '../components/StarRating';
+import AddReview from '../components/AddReview';
+import Reviews from '../components/Reviews';
 import { RestaurantsContext } from '../context/RestaurantsContext';
 
 const Detail = () => {
@@ -13,7 +14,7 @@ const Detail = () => {
     async function getRestaurant() {
       try {
         const response = await restaurantsAPI.get(`/${id}`);
-        setSelectedRestaurant(response.data.data.restaurants[0]);
+        setSelectedRestaurant(response.data);
       } catch (error) {
         console.log(error.message);
       }
@@ -22,11 +23,17 @@ const Detail = () => {
     getRestaurant();
   }, [id, setSelectedRestaurant]);
 
+  if (!selectedRestaurant) {
+    return null;
+  }
+
   return (
     <div>
-      <h1 className="text-center py-4">Detail</h1>
-      <h2>{selectedRestaurant.name}</h2>
-      <StarRating rating={3.3} />
+      <h1 className="text-center py-4">
+        {selectedRestaurant.restaurants[0].name}
+      </h1>
+      <Reviews reviews={selectedRestaurant.reviews} />
+      <AddReview />
     </div>
   );
 };
