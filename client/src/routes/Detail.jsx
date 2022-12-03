@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import restaurantsAPI from '../api/restaurants';
 import AddReview from '../components/AddReview';
 import Reviews from '../components/Reviews';
+import StarRating from '../components/StarRating';
 import { RestaurantsContext } from '../context/RestaurantsContext';
 
 const Detail = () => {
@@ -32,6 +33,12 @@ const Detail = () => {
       <h1 className="text-center py-4">
         {selectedRestaurant.restaurants[0].name}
       </h1>
+      <div className="d-flex justify-content-center">
+        <StarRating rating={selectedRestaurant.restaurants[0].rating_average} />
+        <div className="text-warning ml-1">{`(${
+          selectedRestaurant.restaurants[0].rating_count || 0
+        })`}</div>
+      </div>
       <Reviews reviews={selectedRestaurant.reviews} />
       <AddReview />
     </div>

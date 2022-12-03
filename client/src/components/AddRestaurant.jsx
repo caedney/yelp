@@ -20,7 +20,7 @@ const AddRestaurant = () => {
           price_range: priceRange,
         });
 
-        addRestaurants(response.data.data.restaurants[0]);
+        addRestaurants(response.data.restaurants[0]);
       } catch (error) {
         console.log(error.message);
       }

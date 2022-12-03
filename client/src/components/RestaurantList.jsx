@@ -2,6 +2,7 @@ import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
 import restaurantsAPI from '../api/restaurants';
 import { RestaurantsContext } from '../context/RestaurantsContext';
+import StarRating from './StarRating';
 
 const RestaurantList = (props) => {
   const { restaurants, setRestaurants } = React.useContext(RestaurantsContext);
@@ -12,7 +13,7 @@ const RestaurantList = (props) => {
     async function getRestaurants() {
       try {
         const response = await restaurantsAPI.get('/');
-        setRestaurants(response.data.data.restaurants);
+        setRestaurants(response.data.restaurants);
       } catch (error) {
         console.log(error.message);
       }
@@ -47,6 +48,17 @@ const RestaurantList = (props) => {
     history(`/restaurants/${id}`);
   };
 
+  const renderRating = (restaurant) => {
+    return (
+      <div className="d-flex">
+        <StarRating rating={restaurant.rating_average} />
+        <div className="text-warning ml-1">{`(${
+          restaurant.rating_count || 0
+        })`}</div>
+      </div>
+    );
+  };
+
   return (
     <div className="list-group">
       <table className="table table-hover table-dark align-middle">
@@ -69,7 +81,7 @@ const RestaurantList = (props) => {
                 <td>{name}</td>
                 <td>{location}</td>
                 <td>{'$'.repeat(price_range)}</td>
-                <td>Reviews</td>
+                <td>{renderRating(restaurant)}</td>
                 <td>
                   <button
                     className="btn btn-warning"

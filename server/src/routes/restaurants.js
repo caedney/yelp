@@ -9,14 +9,12 @@ const router = new Router();
 // Get all restaurants
 router.get('/', async (req, res) => {
   try {
-    const results = await db.query('SELECT * FROM restaurants');
+    const results = await db.query(
+      'SELECT * FROM restaurants LEFT JOIN(SELECT restaurant_id, COUNT(*) as rating_count, TRUNC(AVG(rating), 1) as rating_average FROM reviews GROUP BY restaurant_id) reviews on restaurants.id = reviews.restaurant_id;'
+    );
 
     return res.status(200).json({
-      status: 'success',
-      results: results.rows.length,
-      data: {
-        restaurants: results.rows,
-      },
+      restaurants: results.rows,
     });
   } catch (error) {
     console.log(error.message);
@@ -35,11 +33,7 @@ router.post('/', async (req, res) => {
     );
 
     return res.status(200).json({
-      status: 'success',
-      results: 1,
-      data: {
-        restaurants: results.rows,
-      },
+      restaurants: results.rows,
     });
   } catch (error) {
     console.log(error.message);
@@ -51,10 +45,9 @@ router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Parameterized query
-    // Prevents vulnerability from SQL injection attacks
+    // $ Parameterized query prevents vulnerability from SQL injection attacks
     const restaurant = await db.query(
-      'SELECT * FROM restaurants WHERE id = $1',
+      'SELECT * FROM restaurants LEFT JOIN(SELECT restaurant_id, COUNT(*) as rating_count, TRUNC(AVG(rating), 1) as rating_average FROM reviews GROUP BY restaurant_id) reviews on restaurants.id = reviews.restaurant_id WHERE id = $1',
       [id]
     );
 
@@ -84,11 +77,7 @@ router.put('/:id', async (req, res) => {
     );
 
     return res.status(200).json({
-      status: 'success',
-      results: 1,
-      data: {
-        restaurants: results.rows,
-      },
+      restaurants: results.rows,
     });
   } catch (error) {
     console.log(error.message);
@@ -102,9 +91,7 @@ router.delete('/:id', async (req, res) => {
 
     await db.query('DELETE FROM restaurants WHERE id = $1', [id]);
 
-    return res.status(204).json({
-      status: 'success',
-    });
+    return res.status(204);
   } catch (error) {
     console.log(error.message);
   }
@@ -117,12 +104,24 @@ router.post('/:id/add-review', async (req, res) => {
     const { name, review, rating } = req.body;
 
     // RETURNING * returns all columns from the newly created row
-    const reviews = await db.query(
+    await db.query(
       'INSERT INTO reviews (restaurant_id, name, review, rating) VALUES ($1, $2, $3, $4) RETURNING *',
       [id, name, review, rating]
     );
 
+    // $ Parameterized query prevents vulnerability from SQL injection attacks
+    const restaurant = await db.query(
+      'SELECT * FROM restaurants LEFT JOIN(SELECT restaurant_id, COUNT(*) as rating_count, TRUNC(AVG(rating), 1) as rating_average FROM reviews GROUP BY restaurant_id) reviews on restaurants.id = reviews.restaurant_id WHERE id = $1',
+      [id]
+    );
+
+    const reviews = await db.query(
+      'SELECT * FROM reviews WHERE restaurant_id = $1',
+      [id]
+    );
+
     return res.status(200).json({
+      restaurants: restaurant.rows,
       reviews: reviews.rows,
     });
   } catch (error) {

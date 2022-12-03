@@ -14,9 +14,9 @@ const UpdateRestaurant = () => {
     async function getRestaurant() {
       try {
         const response = await restaurantsAPI.get(`/${id}`);
-        setName(response.data.data.restaurants[0].name);
-        setLocation(response.data.data.restaurants[0].location);
-        setPriceRange(response.data.data.restaurants[0].price_range);
+        setName(response.data.restaurants[0].name);
+        setLocation(response.data.restaurants[0].location);
+        setPriceRange(response.data.restaurants[0].price_range);
       } catch (error) {
         console.log(error.message);
       }

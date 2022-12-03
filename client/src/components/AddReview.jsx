@@ -1,9 +1,12 @@
 import * as React from 'react';
 import { useParams } from 'react-router-dom';
 import restaurantsAPI from '../api/restaurants';
+import { RestaurantsContext } from '../context/RestaurantsContext';
 
 const AddReview = () => {
   const { id } = useParams();
+  const { setSelectedRestaurant } = React.useContext(RestaurantsContext);
+
   const [name, setName] = React.useState('');
   const [review, setReview] = React.useState('');
   const [rating, setRating] = React.useState('Rating');
@@ -18,7 +21,7 @@ const AddReview = () => {
         rating,
       });
 
-      console.log(response);
+      setSelectedRestaurant(response.data);
     } catch (error) {
       console.log(error.message);
     }
